@@ -1,0 +1,17 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - Weight Loss Challenge</title>
+      {% else %}
+      <title>Welcome to Weight Loss Challenge</title>
+      {% endif %}
+    </head>
+    <body>
+      <div>
+	Weight Loss Challenge: <a href="{{ url_for('index') }}">Home</a>
+	<a href="{{ url_for('login') }}">Login</a>
+      </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
