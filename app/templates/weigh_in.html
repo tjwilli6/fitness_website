@@ -1,23 +1,10 @@
 {% extends "base.html" %}
-
-{% block content %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
     <h1>Weigh In</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.timestamp.label }}<br>
-            {{ form.timestamp(size=32) }}<br>
-            {% for error in form.timestamp.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.weight.label }}<br>
-            {{ form.weight(size=32) }}<br>
-            {% for error in form.weight.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
 {% endblock %}

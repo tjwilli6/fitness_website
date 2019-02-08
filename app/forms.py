@@ -27,8 +27,8 @@ class RegistrationForm(FlaskForm):
             
 
 class WeighInForm(FlaskForm):
-    weight = FloatField('Weight [lbs]',validators=[DataRequired()])
     timestamp = DateField('Date',default=date.today())
+    weight = FloatField('Weight [lbs]',validators=[DataRequired()])
     submit = SubmitField('Submit')
     
     def validate_weight(self,weight):
