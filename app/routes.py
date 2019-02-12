@@ -24,7 +24,7 @@ def mangle_filename(fname,size=5):
 
 
 def get_image():
-    files = [f for f in os.listdir("app/static/images") if not os.path.isdir(f)]
+    files = [f for f in os.listdir("app/static/images") if not os.path.isdir( os.path.join('app','static','images',f) ) ]
 
     if files:
         im = files [np.random.randint(0,len(files))]
