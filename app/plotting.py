@@ -8,7 +8,7 @@ Created on Fri Feb  8 17:47:17 2019
 
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 from matplotlib import dates as mdates
 import datetime
 import os
@@ -16,7 +16,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 plt.style.use( os.path.join(basedir, "plotting.mplstyle" ) )
-sns.set_style('whitegrid')
+#sns.set_style('whitegrid')
 
 
 def round_to_nearest(num,mode='up',factor=10.):
@@ -53,6 +53,7 @@ class Plotter(object):
             ax.set_ylabel('Weight [lbs]')
 
         plt.minorticks_on()
+        plt.grid()
         return ax
 
     def scale_axes(self,user,ax):
