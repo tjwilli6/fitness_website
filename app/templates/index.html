@@ -1,14 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <head>
-        <title>{{ title }} -Weight Loss Challenge</title>
-    </head>
-    <body>
-        {% if current_user.is_authenticated %}
-        <h1>Hello, {{ current_user.first_name }}!</h1>
-        {% else %}
-        <h1>Welcome!</h1>
-        {% endif %}
-    </body>
+
+<style>
+    { margin: 0; padding: 0; }
+
+    html {
+        background: url( "static/images/{{image}}" ) no-repeat center center fixed;
+        {#background: url( "static/images/tyler-plot.png" ) no-repeat center center fixed;#}
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+</style>
+
+<head>
+    <title>{{ title }} -Weight Loss Challenge</title>
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <h1>Hello, {{ current_user.first_name }}!</h1>
+    {% else %}
+    <h1>Williamson Family Weight Loss Challenge!</h1>
+    {% endif %}
+</body>
 {% endblock %}
