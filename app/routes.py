@@ -12,6 +12,7 @@ import analysis as ana
 import plotting
 import os
 import string
+import config as cfg
 
 
 def mangle_filename(fname,size=5):
@@ -24,30 +25,30 @@ def mangle_filename(fname,size=5):
 
 def get_image():
     files = [f for f in os.listdir("app/static/images") if not os.path.isdir(f)]
-    
+
     if files:
         im = files [np.random.randint(0,len(files))]
         print im
         return im
- 
-def plot_user(fname):
+
+def plot_user(fname,ianauser,norm=False):
     iname = current_user.first_name
     outdir = os.path.join('app','static','images','plots','user',iname.lower())
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
-    
-    fname_full = os.path.join(outdir,fname)
-    
-    ianauser = ana.AnaData(current_user)
 
-    plotter = plotting.Plotter()
+    fname_full = os.path.join(outdir,fname)
+
+
+
+    plotter = plotting.Plotter(norm=norm)
     plotter.plot_user(ianauser)
     plotter.savefig(fname_full)
-    
+
     fname_rel = os.path.join('..','static','images','plots','user',iname.lower(),os.path.split(fname_full)[-1])
-    
+
     return mangle_filename(fname_rel)
-    
+
 
 @app.route('/')
 @app.route('/index')
@@ -59,20 +60,25 @@ def index():
 @app.route('/user/<username>')
 @login_required
 def user(username):
-    
+
     measurements = Measurement.query.filter_by(email=current_user.email)
-    
-    fname = plot_user("{}-plot.png".format(current_user.first_name.lower()))
-    
+    ianauser = ana.AnaData(current_user)
+
+    fname = plot_user("{}-plot.png".format(current_user.first_name.lower()), ianauser )
+
+
+    date = cfg.DT_STOP
+    proj_weight,proj_weight_err = ianauser.get_projected_weight(date)
     return render_template('user.html',measurements=measurements,title="{}'s Page".format(current_user.first_name),
-                           fname=fname)
+                           fname=fname,user=ianauser,date=date,
+                           proj_weight=proj_weight,proj_weight_err=proj_weight_err)
 
 @app.route('/user/remove_data',methods=['GET', 'POST'])
 @login_required
 def remove_data():
-    
+
     form = get_remove_weight_form(current_user)
-    
+
     if form.validate_on_submit():
         measurements = Measurement.query.filter_by(email=current_user.email)
         for i,meas in enumerate(measurements):
@@ -82,7 +88,7 @@ def remove_data():
             if cbox.data:
                 db.session.delete(meas)
                 db.session.commit()
-        
+
         return redirect(url_for('user', username=current_user.first_name))
     return render_template('remove_data.html',form=form)
 
@@ -142,9 +148,9 @@ def weigh_in():
         date = form.timestamp.data
         time = datetime.datetime.now().time()
         dt = datetime.datetime.combine(date,time)
-        
+
         weight = form.weight.data
-        
+
         measurement = Measurement(timestamp=dt,email=email,weight=weight)
         db.session.add(measurement)
         db.session.commit()

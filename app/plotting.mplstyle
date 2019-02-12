@@ -1,0 +1,33 @@
+# this takes all the inputs that go into a normal matplotlib.rc but these have been tuned to produce presentations
+
+figure.figsize : 6,5
+figure.dpi : 120
+
+font.weight : bold
+
+axes.titlesize : 17
+axes.labelsize : 17
+axes.labelpad : 8
+
+lines.linewidth : 1
+lines.markersize : 5
+
+errorbar.capsize : 0
+
+legend.frameon : True
+legend.columnspacing : 0.5
+
+xtick.labelsize : 16
+ytick.labelsize : 16
+xtick.major.pad : 8
+ytick.major.pad : 8
+
+xtick.major.size : 8
+ytick.major.size : 8
+xtick.minor.size : 4
+ytick.minor.size : 4
+
+xtick.major.width : 1.25
+ytick.major.width : 1.25
+xtick.minor.width : 1.
+ytick.minor.width : 1.

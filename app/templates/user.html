@@ -38,15 +38,29 @@ html {
 }
 
 .menu li {
-  padding: 8px;
-  margin-bottom: 7px;
   background-color: #33b5e5;
   color: #ffffff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  display: block;
 }
 
 .menu li:hover {
   background-color: #0099cc;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #FFFFFF;
+  display: block;
+  padding: 8px;
+  margin-bottom: 7px;
+  font-size: 20px;
+}
+
+.menu li a:hover {
+  text-decoration: none;
+  color: #000000;
+  background-color: #33B5E5;
 }
 
 .aside {
@@ -106,11 +120,12 @@ table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
+  text-align:center;
 }
 
 td, th {
   border: 1px solid #dddddd;
-  text-align: left;
+  text-align: center;
   padding: 8px;
 }
 
@@ -119,7 +134,7 @@ tr:nth-child(even) {
 }
 
 /* unvisited link */
-a:link {
+{# a:link {
   color: white;
 }
 
@@ -137,6 +152,7 @@ a:hover {
 a:active {
   color: white;
 }
+#}
 
 </style>
 
@@ -155,7 +171,7 @@ a:active {
 
 
 <div class="row" style="padding:15px">
-  <div class="col-3 col-s-3">
+  <!-- <div class="col-3 col-s-3">
     <table>
       <tr>
         <th>Date</th>
@@ -175,12 +191,54 @@ a:active {
         <li><a href="{{url_for('remove_data')}}">Remove Data</a></li>
       </ul>
     </div>
+  </div> -->
+
+  <div class="col-4 col-s4">
+    <ul>
+      {% if user.status %}
+      <li><h3>Your current weight: {{user.get_ydata()[-1]}} lbs</h3></li>
+      {% else %}
+      <li><h3>No weight measurements yet</h3></li>
+      {% endif %}
+      {% if user.fit_status %}
+      {% if user.fit_result[0] <= 0 %}
+      <li><h3 style="color:green">You are losing {{'%0.1f'| format(user.fit_result[0]*-7|float)}} +/- {{'%0.1f'| format(user.fit_result[1]*7|float)}} lbs per week!</h3></li>
+      {% else %}
+      <li><h3 style="color:red">You are gaining {{'%0.1f'| format(user.fit_result[0]*7|float)}} +/- {{'%0.1f'| format(user.fit_result[1]*7|float)}} lbs per week</h3></li>
+      {% endif %}
+      {% else %}
+      <li><h3>There isn't enough data (yet) to estimate your average weight loss</h3></li>
+      {% endif %}
+      {% if proj_weight %}
+      <li><h3>Your projected weight by {{date}} is {{'%d'| format(proj_weight|int)}} +/- {{'%d'| format(proj_weight_err|int)}} lbs</h3></li>
+      {% else %}
+      <li><h3>There isn't enough data (yet) to estimate your projected weight by {{date}}</h3></li>
+      {% endif %}
+    </ul>
+    <br>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Weight</th>
+      </tr>
+      {% for meas in measurements %}
+      <tr>
+        <td>{{meas.timestamp.date()}}</td>
+        <td>{{meas.weight}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br>
+      <div class="menu">
+      <ul>
+        <li> <a href="{{url_for('weigh_in')}}">Add Data</a> </li>
+        <li><a href="{{url_for('remove_data')}}">Remove Data</a></li>
+      </ul>
+      </div>
   </div>
 
-  <div class="col-5 col-s5">
-    {# <img src="{{url_for('user',username=current_user.first_name)}}/{{fname}}"> #}
-    {# <img src="plots/user/Tyler/tyler-plot.png"> #}
-    <img src="{{fname}}">
+  <div class="col-8 col-s8">
+    <img src="{{fname}}" style="display:block;margin:auto;">
   </div>
 </div>
 
