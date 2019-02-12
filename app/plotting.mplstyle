@@ -3,7 +3,7 @@
 figure.figsize : 6,5
 figure.dpi : 120
 
-font.weight : bold
+font.weight : normal
 
 axes.titlesize : 17
 axes.labelsize : 17
