@@ -24,5 +24,14 @@ body {
     {% else %}
     <h1>Williamson Family Weight Loss Challenge!</h1>
     {% endif %}
+    <br>
+    <div style="width:800px; margin:0 auto;text-align:center">
+      <h2>Contest ends in {{days_left}} days!</h2>
+      {% if leaders|length==1 %}
+      <h2>{{leaders[0]}} is in the lead!</h2>
+      {% elif leaders|length >1 %}
+      <h2>{{leaders|join(', ')}} share the lead!</h2>
+      {% endif %}
+    </div>
 </body>
 {% endblock %}

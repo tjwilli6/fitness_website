@@ -89,7 +89,15 @@ def plot_active_users(fname,ianausers,norm=True):
 @app.route('/index')
 #@login_required
 def index():
-    return render_template('index.html', title='Home', image=get_image())
+    days_left = np.abs( (cfg.DT_STOP - datetime.date.today()).days )
+    users = get_active_users()
+    leaders = []
+    leaders.append(users[0])
+    for user in users[1:]:
+        if np.isclose(user.get_ydata()[-1],leaders[0].get_ydata()[-1]):
+            leaders.append(user)
+    return render_template('index.html', title='Home', image=get_image(),
+        days_left=days_left,leaders=[l.get_user().first_name for l in leaders])
 
 
 @app.route('/user/<username>')
