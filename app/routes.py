@@ -26,8 +26,8 @@ def get_active_users():
             continue
         weights.append( ianauser.get_ydata()[-1] )
     #Remove users who don't have any data
-    for inds in bad_inds:
-        ianausers.pop(i)
+    for ind in bad_inds:
+        ianausers.pop(ind)
     ianausers = [ iana for _,iana in sorted( zip(weights,ianausers) ) ]
 
     return ianausers
