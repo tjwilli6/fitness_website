@@ -14,6 +14,7 @@ import os
 import string
 import config as cfg
 from utils import DateUtil
+import pickle
 
 
 def get_active_users():
@@ -48,6 +49,27 @@ def get_image():
         im = files [np.random.randint(0,len(files))]
         return im
 
+def get_plotting_colors(users):
+
+    cdict = {}
+    b_writedict = False
+    if os.path.isfile(cfg.COLORS_FNAME):
+        with open(cfg.COLORS_FNAME) as f:
+            cdict = pickle.load(f)
+
+    iter_colors = plotting.Plotter.iter_colors()
+    for user in users:
+        if user.get_user().email in cdict.keys():
+            continue
+        b_writedict = True
+        cdict [user.get_user().email] = iter_colors.next()
+
+    if b_writedict:
+        with open(cfg.COLORS_FNAME,'w') as f:
+            pickle.dump(cdict,f)
+
+    return cdict
+
 def plot_user(fname,ianauser,norm=False):
     iname = current_user.first_name
     outdir = os.path.join('app','static','images','plots','user',iname.lower())
@@ -55,8 +77,6 @@ def plot_user(fname,ianauser,norm=False):
         os.makedirs(outdir)
 
     fname_full = os.path.join(outdir,fname)
-
-
 
     plotter = plotting.Plotter(norm=norm)
     plotter.plot_user(ianauser)
@@ -75,6 +95,8 @@ def plot_active_users(fname,ianausers,norm=True):
         os.makedirs(outdir)
 
     fname_full = os.path.join(outdir,fname)
+
+    colors = get_plotting_colors(ianausers)
 
     plotter = plotting.Plotter(norm=norm)
 

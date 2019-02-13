@@ -42,6 +42,12 @@ class Plotter(object):
         self.date_fmt =  mdates.DateFormatter('%m/%d')
 
 
+    @staticmethod
+    def iter_colors():
+        i = -1
+        while True:
+            i+=1
+            yield Plotter.colors [ i % len(Plotter.colors) ]
 
     def format_axes(self,ax):
 
@@ -137,10 +143,17 @@ class Plotter(object):
 
             ax.set_ylim(ymin_lim,ymax_lim)
 
-    def plot_all_users(self,users):
+    def plot_all_users(self,users,colors=None):
+        color_gen = Plotter.iter_colors()
         for i,user in enumerate( users ):
             name = user.get_user().first_name
-            color = self.colors[i%len(self.colors)]
+            if colors is None:
+                color = color_gen.next()
+            elif user.get_user().email not in colors.keys():
+                color = color_gen.next()
+            else:
+                color = colors [user.get_user().email]
+
             self.plot_user(user,label=name,color=color,
                 fmt_axes=False,plot_ci=False)
         self.scale_axes_users(users,plt.gca())
