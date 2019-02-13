@@ -15,6 +15,7 @@ import string
 import config as cfg
 from utils import DateUtil
 import pickle
+from matplotlib import colors
 
 
 def get_active_users():
@@ -146,8 +147,12 @@ def results():
 
     ianausers = get_active_users()
     fname = plot_active_users("results-plot.png",ianausers)
+    icolors = get_plotting_colors(ianausers)
+    for key in icolors.keys():
+        icolors[key] = colors.to_hex(icolors[key])
+
     return render_template("results_sum.html",anausers=ianausers,
-        fname=fname,image=get_image())
+        fname=fname,image=get_image(),colors=icolors)
 
 
 @app.route('/user/remove_data',methods=['GET', 'POST'])

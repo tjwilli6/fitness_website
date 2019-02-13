@@ -190,12 +190,12 @@ a:active {
       </tr>
       {% for user in anausers %}
       <tr>
-        <td>{{loop.index}}</td>
-        <td>{{user.get_user().first_name}}</td>
+        <td><font color={{colors[user.get_user().email]}}>{{loop.index}}</font></td>
+        <td><font color={{colors[user.get_user().email]}}>{{user.get_user().first_name}}</font></td>
         {% if user.get_ydata()[-1] <=100 %}
-        <td>-{{'%0.2f'| format(100 - user.get_ydata()[-1]|float)}} %</td>
+        <td><font color={{colors[user.get_user().email]}}>-{{'%0.2f'| format(100 - user.get_ydata()[-1]|float)}} %</font></td>
         {% else %}
-        <td>+{{'%0.2f'| format(-100 + user.get_ydata()[-1]|float)}} %</td>
+        <td><font color={{colors[user.get_user().email]}}>+{{'%0.2f'| format(-100 + user.get_ydata()[-1]|float)}} %</font></td>
         {% endif %}
       </tr>
       {% endfor %}
