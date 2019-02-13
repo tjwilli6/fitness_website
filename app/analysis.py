@@ -9,7 +9,7 @@ Created on Fri Feb  8 16:43:22 2019
 
 import numpy as np
 from scipy.optimize import curve_fit
-from models import Measurement
+from models import Measurement, User
 import config
 import matplotlib.pyplot as plt
 import datetime
@@ -27,6 +27,8 @@ class UserDataBase(object):
         self.norm = norm
         self.__load_data__()
 
+    def get_user(self):
+        return self.__user
 
     def __load_data__(self):
         """Query the user data"""

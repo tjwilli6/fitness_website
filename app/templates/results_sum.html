@@ -9,13 +9,15 @@
   box-sizing: border-box;
 }
 
+
 body {
-    background: url( "../static/images/{{image}}" ) no-repeat center center fixed;
+    background: url( "static/images/{{image}}" ) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
   }
+
 .row::after {
   content: "";
   clear: both;
@@ -139,13 +141,13 @@ td, th {
 tr:nth-child(even) {
   background-color: #dddddd;
 }
-
 tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
 /* unvisited link */
-{# a:link {
+<!--
+a:link {
   color: white;
 }
 
@@ -162,94 +164,40 @@ a:hover {
 /* selected link */
 a:active {
   color: white;
-}
-#}
+} -->
 
 </style>
-
-
-<head>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-</head>
 
 <body>
 
 <div class="header" >
-  <h1>{{current_user.first_name}}'s Data</h1>
+  <h1>Contest Results</h1>
 </div>
 
 
 <div class="row" style="padding:15px">
-  <!-- <div class="col-3 col-s-3">
+  <div class="col-4 col-s8">
     <table>
       <tr>
-        <th>Date</th>
-        <th>Weight</th>
+        <th>Place</th>
+        <th>Name</th>
+        <th>% Difference</th>
       </tr>
-      {% for meas in measurements %}
+      {% for user in anausers %}
       <tr>
-        <td>{{meas.timestamp.date()}}</td>
-        <td>{{meas.weight}}</td>
+        <td>{{loop.index}}</td>
+        <td>{{user.get_user().first_name}}</td>
+        {% if user.get_ydata()[-1] <=100 %}
+        <td>-{{'%0.2f'| format(100 - user.get_ydata()[-1]|float)}} %</td>
+        {% else %}
+        <td>+{{'%0.2f'| format(-100 + user.get_ydata()[-1]|float)}} %</td>
+        {% endif %}
       </tr>
       {% endfor %}
     </table>
-    <br>
-      <div class="menu">
-      <ul>
-        <li> <a href="{{url_for('weigh_in')}}">Add Data</a> </li>
-        <li><a href="{{url_for('remove_data')}}">Remove Data</a></li>
-      </ul>
-    </div>
-  </div> -->
-
-  <div class="col-4 col-s4">
-    <ul style="background: rgba(211,211,211,0.8);border-radius:25px">
-      {% if user.status %}
-      <li><h3>Your current weight: {{user.get_ydata()[-1]}} lbs</h3></li>
-      {% else %}
-      <li><h3>No weight measurements yet</h3></li>
-      {% endif %}
-      {% if user.fit_status %}
-      {% if user.fit_result[0] <= 0 %}
-      <li><h3 style="color:green">You are losing {{'%0.1f'| format(user.fit_result[0]*-7|float)}} +/- {{'%0.1f'| format(user.fit_result[1]*7|float)}} lbs per week!</h3></li>
-      {% else %}
-      <li><h3 style="color:red">You are gaining {{'%0.1f'| format(user.fit_result[0]*7|float)}} +/- {{'%0.1f'| format(user.fit_result[1]*7|float)}} lbs per week</h3></li>
-      {% endif %}
-      {% else %}
-      <li><h3>There isn't enough data (yet) to estimate your average weight loss</h3></li>
-      {% endif %}
-      {% if proj_weight %}
-      <li><h3>Your projected weight by {{date}} is {{'%d'| format(proj_weight|int)}} +/- {{'%d'| format(proj_weight_err|int)}} lbs</h3></li>
-      {% else %}
-      <li><h3>There isn't enough data (yet) to estimate your projected weight by {{date}}</h3></li>
-      {% endif %}
-    </ul>
-    <br>
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Weight</th>
-      </tr>
-      {% for meas in measurements %}
-      <tr>
-        <td>{{meas.timestamp.date()}}</td>
-        <td>{{meas.weight}}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    <br>
-      <div class="menu">
-      <ul>
-        <li> <a href="{{url_for('weigh_in')}}">Add Data</a> </li>
-        <li><a href="{{url_for('remove_data')}}">Remove Data</a></li>
-      </ul>
-      </div>
   </div>
-
   <div class="col-8 col-s8">
-    <img src="../{{fname}}" style="display:block;margin:auto;border:2px solid black;border-radius:25px">
+    <img src="{{fname}}" style="display:block;margin:auto;border:2px solid black;border-radius:25px">
   </div>
 </div>
 

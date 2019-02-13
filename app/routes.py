@@ -15,6 +15,23 @@ import string
 import config as cfg
 
 
+def get_active_users():
+
+    ianausers = map( ana.AnaData,User.query.all() )
+    bad_inds = []
+    weights = []
+    for i,ianauser in enumerate( ianausers ):
+        if not ianauser.status:
+            bad_inds.append(i)
+            continue
+        weights.append( ianauser.get_ydata()[-1] )
+    #Remove users who don't have any data
+    for inds in bad_inds:
+        ianausers.pop(i)
+    ianausers = [ iana for _,iana in sorted( zip(weights,ianausers) ) ]
+
+    return ianausers
+
 def mangle_filename(fname,size=5):
     """From https://stackoverflow.com/questions/728616/disable-cache-for-some-images
     Adds a random dummy string to the end of the file name so the browser won't cache it"""
@@ -24,11 +41,10 @@ def mangle_filename(fname,size=5):
 
 
 def get_image():
-    files = [f for f in os.listdir("app/static/images") if not os.path.isdir( os.path.join('app','static','images',f) ) ]
+    files = [f for f in os.listdir("app/static/images") if not os.path.isdir( os.path.join('app','static','images',f) ) and '_alpha' in f ]
 
     if files:
         im = files [np.random.randint(0,len(files))]
-        print im
         return im
 
 def plot_user(fname,ianauser,norm=False):
@@ -49,6 +65,25 @@ def plot_user(fname,ianauser,norm=False):
 
     return mangle_filename(fname_rel)
 
+def plot_active_users(fname,ianausers,norm=True):
+    iname = 'results_sum'
+
+    outdir = os.path.join('app','static','images','plots','all',iname.lower())
+
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+
+    fname_full = os.path.join(outdir,fname)
+
+    plotter = plotting.Plotter(norm=norm)
+
+    plotter.plot_all_users(ianausers)
+
+    plotter.savefig(fname_full)
+
+    fname_rel = os.path.join('..','static','images','plots','all',iname.lower(),os.path.split(fname_full)[-1])
+
+    return mangle_filename(fname_rel)
 
 @app.route('/')
 @app.route('/index')
@@ -71,7 +106,18 @@ def user(username):
     proj_weight,proj_weight_err = ianauser.get_projected_weight(date)
     return render_template('user.html',measurements=measurements,title="{}'s Page".format(current_user.first_name),
                            fname=fname,user=ianauser,date=date,
-                           proj_weight=proj_weight,proj_weight_err=proj_weight_err)
+                           proj_weight=proj_weight,proj_weight_err=proj_weight_err,
+                           image=get_image())
+
+@app.route('/results')
+@login_required
+def results():
+
+    ianausers = get_active_users()
+    fname = plot_active_users("results-plot.png",ianausers)
+    return render_template("results_sum.html",anausers=ianausers,
+        fname=fname,image=get_image())
+
 
 @app.route('/user/remove_data',methods=['GET', 'POST'])
 @login_required
