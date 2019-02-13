@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField,DateField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User,Measurement
-from datetime import date
+from utils import DateUtil
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
@@ -24,27 +24,28 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
-            
+
 
 class WeighInForm(FlaskForm):
-    timestamp = DateField('Date',default=date.today())
+    #Store times in TZ specified in config.TIMEZONE
+    timestamp = DateField('Date',default=DateUtil.utcnow().date())
     weight = FloatField('Weight [lbs]',validators=[DataRequired()])
     submit = SubmitField('Submit')
-    
+
     def validate_weight(self,weight):
         if weight.data <=0 or weight.data >= 5000:
             raise ValidationError("I don't believe that is your weight. Idiot.")
-            
-            
+
+
 def get_remove_weight_form(user):
     measurements = Measurement.query.filter_by(email=user.email)
     class RemoveWeightForm(FlaskForm):
         pass
-        
+
     for i,meas in enumerate(measurements):
         name = '{} ({}, {} lbs)'.format(i+1,meas.timestamp.date(),meas.weight)
         setattr(RemoveWeightForm,'field_{}'.format(i+1),BooleanField(name))
-        
+
     RemoveWeightForm.submit = SubmitField('Remove Data')
-    
+
     return RemoveWeightForm()

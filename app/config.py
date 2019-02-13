@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 WT_ERROR = 5.
 DT_STOP = datetime.date(year=2019,month=6,day=1)
-
+TIMEZONE = 'EST'
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'not_a_doctor___shhh'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

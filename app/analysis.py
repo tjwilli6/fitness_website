@@ -13,6 +13,7 @@ from models import Measurement, User
 import config
 import matplotlib.pyplot as plt
 import datetime
+from app.utils import DateUtil
 
 class UserDataBase(object):
 
@@ -42,8 +43,7 @@ class UserDataBase(object):
             weights = np.array( [m.weight for m in measurements] )
 
             weights = np.array( [x for _,x in sorted( zip(dates,weights) ) ] )
-            dates = np.array ( sorted(dates) )
-            dates = np.array( [d.date() for d in dates ] )
+            dates = DateUtil.convert_datetimes( np.array ( sorted(dates) ),convert_to_date=True)
 
             days = np.array( [td.total_seconds() / 3600. / 24. for td in dates - dates[0]] )
 

@@ -13,6 +13,7 @@ import plotting
 import os
 import string
 import config as cfg
+from utils import DateUtil
 
 
 def get_active_users():
@@ -200,7 +201,7 @@ def weigh_in():
         email = current_user.email
         #Measurement wants a datetime, form only gives date
         date = form.timestamp.data
-        time = datetime.datetime.now().time()
+        time = DateUtil.utcnow().time()
         dt = datetime.datetime.combine(date,time)
 
         weight = form.weight.data
