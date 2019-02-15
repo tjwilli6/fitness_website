@@ -101,7 +101,7 @@ def plot_active_users(fname,ianausers,norm=True):
 
     plotter = plotting.Plotter(norm=norm)
 
-    plotter.plot_all_users(ianausers)
+    plotter.plot_all_users(ianausers,colors=colors)
 
     plotter.savefig(fname_full)
 
