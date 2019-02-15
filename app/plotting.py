@@ -29,6 +29,8 @@ class Plotter(object):
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
     offset_max = 10.
     offset_min = 30.
+    offset_max_all = 10.
+    offset_min_all = 10.
 
     def __init__(self,do_errors=True,norm=True,date_min=None,date_max=None):
 
@@ -93,8 +95,8 @@ class Plotter(object):
             iyminpct = iymin / user.get_ydata()[0] * 100
             iymaxpct = iymax / user.get_ydata()[0] * 100
 
-            iymax_lim_pct = iymaxpct + self.offset_max
-            iymin_lim_pct = iyminpct - self.offset_min
+            iymax_lim_pct = iymaxpct + self.offset_max_all
+            iymin_lim_pct = iyminpct - self.offset_min_all
 
             iymax_lim = iymax * iymax_lim_pct/100.
             iymin_lim = iymin * iymin_lim_pct/100.
