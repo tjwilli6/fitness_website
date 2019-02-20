@@ -238,3 +238,8 @@ def weigh_in():
         db.session.commit()
         return redirect(url_for('user',username=current_user.first_name))
     return render_template('weigh_in.html',title='Weigh In',form=form)
+
+#@app.route('/help')
+#def help():
+#    image = get_image()
+#    return render_template('help.html',image=image)
