@@ -28,7 +28,7 @@ class RegistrationForm(FlaskForm):
 
 class WeighInForm(FlaskForm):
     #Store times in TZ specified in config.TIMEZONE
-    timestamp = DateField('Date',default=DateUtil.utcnow().date())
+    timestamp = DateField('Date',default=DateUtil.now().date()) #Show EST date in the login form
     weight = FloatField('Weight [lbs]',validators=[DataRequired()])
     submit = SubmitField('Submit')
 

@@ -1,6 +1,5 @@
 from app import app
-from flask import render_template,redirect,url_for,flash,request,make_response
-from functools import wraps, update_wrapper
+from flask import render_template,redirect,url_for,flash,request
 from app.forms import LoginForm, RegistrationForm, WeighInForm, get_remove_weight_form
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Measurement
@@ -229,7 +228,7 @@ def weigh_in():
         #Measurement wants a datetime, form only gives date
         date = form.timestamp.data
         time = DateUtil.utcnow().time()
-        dt = datetime.datetime.combine(date,time)
+        dt = datetime.datetime.combine(date,time) - DateUtil.get_utc_offset()
 
         weight = form.weight.data
 
