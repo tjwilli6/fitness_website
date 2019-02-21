@@ -112,7 +112,7 @@ def plot_active_users(fname,ianausers,norm=True):
 @app.route('/index')
 #@login_required
 def index():
-    days_left = np.abs( (cfg.DT_STOP - datetime.date.today()).days )
+    days_left = np.abs( (cfg.DT_STOP - DateUtil.now().date() ).days )
     users = get_active_users()
     leaders = []
     leaders.append(users[0])
@@ -227,7 +227,12 @@ def weigh_in():
         email = current_user.email
         #Measurement wants a datetime, form only gives date
         date = form.timestamp.data
-        time = DateUtil.utcnow().time()
+        #Form provides the date Easter Time Zone 
+        #Form doesnt provide a time
+        #This is a work around
+        #Get the time in the same TZ as the form
+        time = DateUtil.now().time()
+        #Now get the datetime object and convert it back to UTC
         dt = datetime.datetime.combine(date,time) - DateUtil.get_utc_offset()
 
         weight = form.weight.data
