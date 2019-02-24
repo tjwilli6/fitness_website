@@ -60,6 +60,63 @@ class UserDataBase(object):
                 self.do_errors = False
 
 
+
+    def get_y0(self):
+        
+        if self.status is None:
+            return
+        d0 = config.DT_STRT
+        y0 = self.get_y_by_date(d0)
+        if y0 is None:
+            return self.get_ydata()[0]
+        return y0
+
+    def get_y_by_date(self,date):
+        """Get a measurement for a given date"""
+        if not self.status:
+            return
+        
+        if not isinstance(date,datetime.date):
+            raise TypeError("Date argument must be 'datetime.date' instance")
+        xdates = self.get_xdata(dates=True)
+        
+        dates_below = xdates [ xdates <= date ]
+        dates_above = xdates [ xdates >= date ]
+        
+        #Get the index of the nearest dates above and below
+        ilow = ihi = None
+    
+        if len(dates_below):
+            ilow = np.argmax(dates_below)
+        if len(dates_above):
+            ihi = np.argmin(dates_above)
+        
+        index = None
+        
+        if ilow is None and ihi is None:
+            return
+        
+        if ilow==ihi:
+            index = ilow   
+            
+        else:
+            if ilow is not None:
+                diff_lo = np.abs ( (date - xdates[ilow]).total_seconds() )
+            else:
+                diff_lo = np.inf
+            if ihi is not None:
+                diff_hi = np.abs ( (date - xdates[ihi]).total_seconds() )
+            else:
+                diff_hi = np.inf
+            
+            if diff_lo < diff_hi:
+                index = ilow
+            else:
+                index = ihi
+        
+        return self.__y_data [index]
+            
+
     def get_xdata(self,dates=False):
 
         if dates:
@@ -70,7 +127,7 @@ class UserDataBase(object):
     def get_norm_factor(self):
         norm = 1
         if self.norm:
-            norm = self.__y_data[0] * 0.01
+            norm = self.get_y0() * 0.01
         return norm
 
     def set_normalized(self,bnorm=True):
@@ -181,7 +238,10 @@ class AnaData(UserDataBase):
         else:
             self.fit_status = True
 
-    def plot_data(self,ax=plt.gca(),color='blue',label=''):
+    def plot_data(self,ax=None,color='blue',label=''):
+        
+        if ax is None:
+            ax = plt.gca()
 
         if not self.status:
             return
@@ -200,7 +260,9 @@ class AnaData(UserDataBase):
 
 
 
-    def plot_butterfly(self,ax=plt.gca(),ndraws=100,color='blue',alpha=.25):
+    def plot_butterfly(self,ax=None,ndraws=100,color='blue',alpha=.25):
+        if ax is None:
+            ax = plt.gca()
 
         if not self.status:
             return
@@ -229,8 +291,9 @@ class AnaData(UserDataBase):
 
 
 
-    def plot_fit(self,ax=plt.gca(),color='blue'):
+    def plot_fit(self,ax=None,color='blue'):
 
+        ax = plt.gca()
         if not self.status:
             return
 

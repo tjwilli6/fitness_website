@@ -217,6 +217,13 @@ a:active {
       <li><h3>No weight measurements yet</h3></li>
       {% endif %}
       {% if user.get_ydata().size > 1 %}
+
+      <!-- If we've lost weight -->
+      {% if user.get_y0() > user.get_ydata()[-1] %}
+      <li><h3 style="color:green">You have lost {{'%0.1f' | format(user.get_y0() - user.get_ydata()[-1]|float)}} pounds so far!</h3></li>
+      {% else %}
+      <li><h3 style="color:red">You have gained {{'%0.1f' | format(- user.get_y0() + user.get_ydata()[-1]|float)}} pounds so far</h3></li>
+      {% endif %}
       {% if user.get_ydata()[-2] >= user.get_ydata()[-1] %}
       <li><h3 style="color:green">You have lost {{'%0.1f'| format(user.get_ydata()[-2] - user.get_ydata()[-1]|float)}} pounds since your last weigh-in!</h3></li>
       {% else %}
