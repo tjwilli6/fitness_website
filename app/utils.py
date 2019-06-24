@@ -2,7 +2,7 @@ import datetime
 #import tzlocal
 import pytz
 import numpy as np
-import config as cfg
+import app.config as cfg
 
 class DateUtil:
 
@@ -40,3 +40,8 @@ class DateUtil:
             dates = [(idt + utcoff) for idt in dt]
 
         return np.array(dates)
+    
+    @staticmethod
+    def date_to_datetime(date,hour=12,minute=0,second=0):
+        dt = datetime.time(hour=hour,minute=minute,second=second)
+        return datetime.datetime.combine(date,dt)

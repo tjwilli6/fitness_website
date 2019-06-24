@@ -7,30 +7,34 @@ from werkzeug.urls import url_parse
 from app import db
 import datetime
 import numpy as np
-import analysis as ana
-import plotting
+import app.analysis as ana
+import app.plotting as plotting
 import os
 import string
-import config as cfg
-from utils import DateUtil
+import app.config as cfg
+from app.utils import DateUtil
 import pickle
 from matplotlib import colors
 
 
 def get_active_users():
 
-    ianausers = map( ana.AnaData,User.query.all() )
-    bad_inds = []
+    ianausers = list( map( ana.AnaData,User.query.all() ) )
+    users = {}
+    bad_names = []
     weights = []
     for i,ianauser in enumerate( ianausers ):
+        users[ianauser.get_user().email] = ianauser
         if not ianauser.status:
-            bad_inds.append(i)
+            bad_names.append(ianauser.get_user().email)
+            print('User[{}] is bad'.format(i))
             continue
         weights.append( ianauser.get_ydata()[-1] )
     #Remove users who don't have any data
-    for ind in bad_inds:
-        ianausers.pop(ind)
-    ianausers = [ iana for _,iana in sorted( zip(weights,ianausers) ) ]
+    for name in bad_names:
+        print('Pop bad user {}'.format(name))
+        users.pop(name)
+    ianausers = [ iana for _,iana in zip(weights,users.values()) ]
 
     return ianausers
 
@@ -54,7 +58,7 @@ def get_plotting_colors(users):
     cdict = {}
     b_writedict = False
     if os.path.isfile(cfg.COLORS_FNAME):
-        with open(cfg.COLORS_FNAME) as f:
+        with open(cfg.COLORS_FNAME,'rb') as f:
             cdict = pickle.load(f)
 
     iter_colors = plotting.Plotter.iter_colors()
@@ -62,10 +66,10 @@ def get_plotting_colors(users):
         if user.get_user().email in cdict.keys():
             continue
         b_writedict = True
-        cdict [user.get_user().email] = iter_colors.next()
+        cdict [user.get_user().email] = next( iter_colors )
 
     if b_writedict:
-        with open(cfg.COLORS_FNAME,'w') as f:
+        with open(cfg.COLORS_FNAME,'wb') as f:
             pickle.dump(cdict,f)
 
     return cdict
@@ -96,6 +100,9 @@ def plot_active_users(fname,ianausers,norm=True):
 
     fname_full = os.path.join(outdir,fname)
 
+    if os.path.isfile(fname_full):
+        os.remove(fname_full)
+        
     colors = get_plotting_colors(ianausers)
 
     plotter = plotting.Plotter(norm=norm)
@@ -115,10 +122,11 @@ def index():
     days_left = np.abs( (cfg.DT_STOP - DateUtil.now().date() ).days )
     users = get_active_users()
     leaders = []
-    leaders.append(users[0])
-    for user in users[1:]:
-        if np.isclose(user.get_ydata()[-1],leaders[0].get_ydata()[-1]):
-            leaders.append(user)
+    if users:
+        leaders.append(users[0])
+        for user in users[1:]:
+            if np.isclose(user.get_ydata()[-1],leaders[0].get_ydata()[-1]):
+                leaders.append(user)
     return render_template('index.html', title='Home', image=get_image(),
         days_left=days_left,leaders=[l.get_user().first_name for l in leaders])
 
@@ -127,7 +135,15 @@ def index():
 @login_required
 def user(username):
 
-    measurements = Measurement.query.filter_by(email=current_user.email)
+    
+    tSTART = DateUtil.date_to_datetime(cfg.DT_STRT)
+    tSTOP = DateUtil.date_to_datetime(cfg.DT_STOP)
+    
+    measurements = [
+            m for m in Measurement.query.filter_by(email=current_user.email).all()
+            if m.timestamp >= tSTART and m.timestamp <= tSTOP
+    ]
+    
     ianauser = ana.AnaData(current_user)
 
     fname = plot_user("{}-plot.png".format(current_user.first_name.lower()), ianauser )

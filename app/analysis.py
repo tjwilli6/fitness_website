@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 """
 Created on Fri Feb  8 16:43:22 2019
 
@@ -9,8 +7,8 @@ Created on Fri Feb  8 16:43:22 2019
 
 import numpy as np
 from scipy.optimize import curve_fit
-from models import Measurement, User
-import config
+from app.models import Measurement, User
+import app.config as config
 import matplotlib.pyplot as plt
 import datetime
 from app.utils import DateUtil
@@ -20,10 +18,10 @@ class UserDataBase(object):
     def __init__(self,user,norm=True):
 
         self.__user = user
-        self.__x_dates = None
-        self.__x_days = None
-        self.__y_data = None
-        self.__y_err = None
+        self.__x_dates = np.array( [] )
+        self.__x_days = np.array( [] )
+        self.__y_data = np.array( [] )
+        self.__y_err = np.array( [] )
         self.do_errors = True
         self.norm = norm
         self.__load_data__()
@@ -35,7 +33,13 @@ class UserDataBase(object):
         """Query the user data"""
         email = self.__user.email
         measurements = Measurement.query.filter_by(email=email).all()
-
+        tSTART = DateUtil.date_to_datetime(config.DT_STRT)
+        tSTOP = DateUtil.date_to_datetime(config.DT_STOP)
+        
+        measurements = [
+                m for m in Measurement.query.filter_by(email=email).all()
+                if m.timestamp >= tSTART and m.timestamp <= tSTOP
+        ]
         weights = np.array( [] )
         dates = np.array( [] )
         if len( measurements ):
@@ -119,9 +123,10 @@ class UserDataBase(object):
 
     def get_xdata(self,dates=False):
 
-        if dates:
-            return self.__x_dates
-        return self.__x_days
+        if self.status:
+            if dates:
+                return self.__x_dates
+            return self.__x_days
 
 
     def get_norm_factor(self):
@@ -135,10 +140,12 @@ class UserDataBase(object):
 
     def get_ydata(self):
 
+        #if self.status:
         return self.__y_data / self.get_norm_factor()
 
     def get_yerror(self):
 
+        #if self.status:
         return self.__y_err / self.get_norm_factor()
 
 
@@ -151,7 +158,7 @@ class UserDataBase(object):
 
     @property
     def status(self):
-        return ( self.__y_data is not None and self.__x_dates is not None
+        return ( self.__y_data.size and self.__x_dates.size
                 and self.__y_data.size > 0 and self.__y_data.size == self.__x_dates.size )
 
 
@@ -334,7 +341,7 @@ class AnaData(UserDataBase):
             proj_weight = self.get_ydata()[-1] + days * m
             proj_weight_err = days * merr
 
-            print merr,days
+            #print merr,days
             return proj_weight,proj_weight_err
         return None,None
 

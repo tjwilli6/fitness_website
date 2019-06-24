@@ -146,21 +146,23 @@ class Plotter(object):
             ax.set_ylim(ymin_lim,ymax_lim)
 
     def plot_all_users(self,users,colors=None):
-        color_gen = Plotter.iter_colors()
-        for i,user in enumerate( users ):
-            name = user.get_user().first_name
-            if colors is None:
-                color = color_gen.next()
-            elif user.get_user().email not in colors.keys():
-                color = color_gen.next()
-            else:
-                color = colors [user.get_user().email]
-
-            self.plot_user(user,label=name,color=color,
-                fmt_axes=False,plot_ci=False)
-        self.scale_axes_users(users,plt.gca())
-        self.format_axes(plt.gca())
-        plt.legend()
+        
+        if users:
+            color_gen = Plotter.iter_colors()
+            for i,user in enumerate( users ):
+                name = user.get_user().first_name
+                if colors is None:
+                    color = color_gen.next()
+                elif user.get_user().email not in colors.keys():
+                    color = color_gen.next()
+                else:
+                    color = colors [user.get_user().email]
+    
+                self.plot_user(user,label=name,color=color,
+                    fmt_axes=False,plot_ci=False)
+            self.scale_axes_users(users,plt.gca())
+            self.format_axes(plt.gca())
+            plt.legend()
 
     def plot_user(self,user,label='',color='blue',fmt_axes=True,
         plot_data=True,plot_fit=True,plot_ci=True):
