@@ -34,7 +34,7 @@ def get_active_users():
     for name in bad_names:
         print('Pop bad user {}'.format(name))
         users.pop(name)
-    ianausers = [ iana for _,iana in zip(weights,users.values()) ]
+    ianausers = [ iana for _,iana in sorted(zip(weights,users.values())) ]
 
     return ianausers
 
