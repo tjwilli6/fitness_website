@@ -2,7 +2,7 @@ pytz==2018.5
 Flask==1.0.2
 scipy==1.1.0
 matplotlib==2.2.3
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 numpy==1.15.1
 app==0.0.1
 flask_bootstrap==3.3.7.1
